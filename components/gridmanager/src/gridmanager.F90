@@ -353,6 +353,8 @@ contains
     integer :: k
 
     do k=2, kkp-1
+      current_state%rmlmax=0.23*(options_get_real(current_state%options_database, "dxx")*&
+              options_get_real(current_state%options_database, "dyy")*vertical_grid%dz(k+1))**(1.0/3.0)
       vertical_grid%rneutml(k)=sqrt(1.0_DEFAULT_PRECISION/(1.0_DEFAULT_PRECISION/(von_karman_constant*&
            (vertical_grid%z(k)+z0))**2+1.0_DEFAULT_PRECISION/current_state%rmlmax**2) )
       vertical_grid%rneutml_sq(k)=vertical_grid%rneutml(k)*vertical_grid%rneutml(k)

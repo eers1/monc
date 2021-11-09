@@ -225,7 +225,7 @@ contains
     type(model_state_type), target, intent(inout) :: current_state
 
     integer :: z_size, y_size, x_size
-    logical :: l_qdiag
+    logical :: l_qdiag=.false.
 
     z_size=current_state%local_grid%size(Z_INDEX) + current_state%local_grid%halo_size(Z_INDEX) * 2
     y_size=current_state%local_grid%size(Y_INDEX) + current_state%local_grid%halo_size(Y_INDEX) * 2
@@ -239,7 +239,7 @@ contains
     ! Set tendency diagnostic logicals based on availability
     ! Need to use 3d tendencies to compute the profiles, so they will be allocated
     !      in the case where profiles are available
-    l_qdiag =  (.not. current_state%passive_q .and. current_state%number_q_fields .gt. 0)
+    !l_qdiag =  (.not. current_state%passive_q .and. current_state%number_q_fields .gt. 0)
 
     l_tend_pr_tot_th  = current_state%th%active 
     l_tend_pr_tot_qv  = l_qdiag .and. current_state%number_q_fields .ge. 1

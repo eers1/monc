@@ -454,6 +454,7 @@ sp2             = 1.5
 sp3             = 0.0
 max_mu          = 25.0
 fix_mu          = 2.5
+b_aut           = -1.79
 
 l_aaut          = .true.
 l_aacc          = .true.
