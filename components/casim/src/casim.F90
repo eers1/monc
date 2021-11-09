@@ -856,7 +856,7 @@ contains
   subroutine read_configuration(current_state)
 
 
-    Use mphys_parameters, only: p1, p2, p3, sp1, sp2, sp3   
+    Use mphys_parameters, only: p1, p2, p3, sp1, sp2, sp3, b_aut   
 
     type(model_state_type), target, intent(inout) :: current_state
 
@@ -878,6 +878,7 @@ contains
     sp3             = options_get_real(current_state%options_database, 'sp3')
     max_mu          = options_get_real(current_state%options_database, 'max_mu')
     fix_mu          = options_get_real(current_state%options_database, 'fix_mu')
+    b_aut           = options_get_real(current_state%options_database, 'b_aut')
 
     l_aaut          = options_get_logical(current_state%options_database, 'l_aaut')
     l_aacc          = options_get_logical(current_state%options_database, 'l_aacc')

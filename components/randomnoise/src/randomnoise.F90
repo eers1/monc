@@ -15,7 +15,7 @@ module randomnoise_mod
   private
 #endif
 
-  integer, parameter :: MAX_SIZE_SEED_ARRAY=256, I_SEED=7, ISD=1
+  integer, parameter :: MAX_SIZE_SEED_ARRAY=256, I_SEED=7, ISD=1  ! I_SEED = 7
 
   public randomnoise_get_descriptor
 contains
