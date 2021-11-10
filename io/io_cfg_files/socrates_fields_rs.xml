@@ -1,0 +1,42 @@
+<data-definition name="socrates_fields_data" frequency="{3d_sampling_frequency}" namespace="socrates_fields">
+  <field name="flux_up_shortwave" type="array" data_type="double" size="z,y,x" collective=true optional=true/>
+  <field name="flux_down_shortwave" type="array" data_type="double" size="z,y,x" collective=true optional=true/>
+  <field name="flux_up_longwave" type="array" data_type="double" size="z,y,x" collective=true optional=true/>
+  <field name="flux_down_longwave" type="array" data_type="double" size="z,y,x" collective=true optional=true/>
+  <field name="toa_up_longwave" type="array" data_type="double" size="y,x" collective=true optional=true/>
+  <field name="surface_down_longwave" type="array" data_type="double" size="y,x" collective=true optional=true/>
+  <field name="surface_up_longwave" type="array" data_type="double" size="y,x" collective=true optional=true/>
+  <field name="toa_down_shortwave" type="array" data_type="double" size="y,x" collective=true optional=true/>
+  <field name="toa_up_shortwave" type="array" data_type="double" size="y,x" collective=true optional=true/>
+  <field name="surface_down_shortwave" type="array" data_type="double" size="y,x" collective=true optional=true/>
+  <field name="surface_up_shortwave" type="array" data_type="double" size="y,x" collective=true optional=true/>
+  <field name="shortwave_heating_rate" type="array" data_type="double" size="z,y,x" collective=true optional=true/>
+  <field name="longwave_heating_rate" type="array" data_type="double" size="z,y,x" collective=true optional=true/>
+  <field name="total_radiative_heating_rate" type="array" data_type="double" size="z,y,x" collective=true optional=true/>
+ </data-definition>
+
+<data-handling namespace="socrates_fields">
+  <diagnostic field="flux_up_SW_mean"  type="scalar" data_type="double" units="W m^-2">
+        <operator name="arithmetic" result="flux_up_SW_mean" equation="flux_up_SW_mean_g/({x_size}*{y_size})"/>
+        <communication name="reduction" operator="sum" result="flux_up_SW_mean_g" field="flux_up_SW_mean_loc_reduced" root="auto"/>
+        <operator name="localreduce" operator="sum" result="flux_up_SW_mean_loc_reduced" field="flux_up_shortwave"/>
+  </diagnostic>
+</data-handling>
+
+<group name="socrates_fields_timeseries">
+  <member name="flux_up_shortwave_mean"/>
+  <member name="flux_down_shortwave_mean"/>
+  <member name="flux_up_longwave_mean"/>
+  <member name="flux_down_longwave_mean"/>
+  <member name="toa_up_longwave_mean"/>
+  <member name="surface_down_longwave_mean"/>
+  <member name="surface_up_longwave_mean"/>
+  <member name="toa_down_shortwave_mean"/>
+  <member name="toa_up_shortwave_mean"/>
+  <member name="surface_down_shortwave_mean"/>
+  <member name="surface_up_shortwave_mean"/>
+  <member name="shortwave_heating_rate_mean"/>
+  <member name="longwave_heating_rate_mean"/>
+  <member name="total_radiative_heating_rate_mean"/>
+ </group>
+
