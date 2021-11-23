@@ -37,18 +37,18 @@ socrates_couple_enabled=.true.
 
 display_synopsis_frequency=100
 nn_consolidation=1
-termination_time=5000.0 #260000.0  
+termination_time=260000.0  
 dtm=0.4
 
 # IO server configuration
 ioserver_configuration_file="io/io_cfg_files/data_write_rs_soc_mean.xml"
 diagnostic_file="run_name/diagnostic_files/sct_run_name.nc"
 moncs_per_io_server=15
-sampling_frequency=60 #2000  # number of timesteps between diag being sent from MONC to IO server.
-3d_sampling_frequency=100 #12000 # same but for 3d
-mm=300.0 # output time interval for a diagnostic (must be larger than model timestep * sampling freq
-mm1=30.0
-diag_write_freq=450.0 # should be larger than the 3d 
+sampling_frequency=2000  # number of timesteps between diag being sent from MONC to IO server.
+3d_sampling_frequency=10500 #12000 # same but for 3d
+mm=4500.0 # output time interval for a diagnostic (must be larger than model timestep * sampling freq
+mm1=1800.0
+diag_write_freq=12000.0 # should be larger than the 3d 
 
 #sampling_frequency=3000  # number of timesteps between diag being sent from MONC to IO server.
 #3d_sampling_frequency=11250 # same but for 3d
@@ -60,7 +60,7 @@ diag_write_freq=450.0 # should be larger than the 3d
 checkpoint_frequency=0
 checkpoint_file="run_name/checkpoint_files/sct_run_name_dump.nc"
 check_walltime_frequency=100
-walltime_limit=00:15:00  #03:00:00
+walltime_limit=08:00:00  #03:00:00
 
 # Advection choices
 advection_flow_fields=tvd
