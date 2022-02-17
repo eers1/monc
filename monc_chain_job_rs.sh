@@ -105,7 +105,7 @@ fi
 
 # --- Run:
 # Run!:
-mpirun ${MONC_EXEC} ${MONC_ARGS} | tee -a ${MONC_OUT}
+mpirun ${MONC_EXEC} ${MONC_ARGS} | tee ${MONC_OUT}
 
 # --- Submit next job:
 
@@ -113,8 +113,8 @@ mpirun ${MONC_EXEC} ${MONC_ARGS} | tee -a ${MONC_OUT}
 check_complete
 
 # Avoid job chaining bug on ARC systems:
-#export PATH=${SGE_O_PATH}
-#unset SGE_STARTER_PLUGINS
+export PATH=${SGE_O_PATH}
+unset SGE_STARTER_PLUGINS
 # Submit next job:
 echo 'Submitting next job in chain ...'
 qsub ${SUBMISSION_SCRIPT_NAME}
