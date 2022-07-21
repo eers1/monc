@@ -17,7 +17,8 @@ module monc_mod
   use configuration_file_parser_mod, only : parse_configuration_file
   use configuration_checkpoint_netcdf_parser_mod, only : parse_configuration_checkpoint_netcdf
   use science_constants_mod, only : initialise_science_constants
-  use mpi, only : MPI_COMM_WORLD, MPI_THREAD_MULTIPLE, MPI_THREAD_SERIALIZED, MPI_THREAD_SINGLE, MPI_THREAD_FUNNELED, mpi_wtime
+  use mpi, only : MPI_COMM_WORLD, MPI_THREAD_MULTIPLE, MPI_THREAD_SERIALIZED, MPI_THREAD_SINGLE, MPI_THREAD_FUNNELED, mpi_wtime, &
+          mpi_errors_return
   use datadefn_mod, only : DEFAULT_PRECISION, init_data_defn
   implicit none
 
@@ -65,6 +66,7 @@ contains
            "' but the maximum level your MPI implementation can provide is '"//&
            trim(mpi_threading_level_to_string(provided_threading))//"'")
     end if    
+    call mpi_comm_set_errhandler(mpi_comm_world, mpi_errors_return, ierr)
     call load_model_configuration(state, state%options_database)
 
     state%io_server_enabled=determine_if_io_server_enabled(state%options_database)
