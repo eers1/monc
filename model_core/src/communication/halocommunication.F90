@@ -15,6 +15,7 @@ module halo_communication_mod
   use logging_mod, only : LOG_ERROR, LOG_WARN, log_log,LOG_DEBUG
   use grids_mod, only : local_grid_type, X_INDEX, Y_INDEX, Z_INDEX
   use mpi, only : MPI_REQUEST_NULL, MPI_STATUSES_IGNORE
+  use mpi_error_handler_mod, only : check_mpi_success
   implicit none
 
 #ifndef TEST_MODE
@@ -205,6 +206,7 @@ contains
     if (halo_swap_state%number_distinct_neighbours .gt. 0) then
       call mpi_waitall(size(halo_swap_state%recv_requests), halo_swap_state%recv_requests, &
            MPI_STATUSES_IGNORE, ierr)
+      call check_mpi_success(ierr, "halo_communication_mod", "complete_nonblocking_halo_swap")
       if (present(source_data)) then
         if (halo_swap_state%involve_corners .and. present(copy_from_halo_buffer_to_corner)) then
           call copy_buffer_data_for_prognostics(current_state, halo_swap_state, &
@@ -224,6 +226,7 @@ contains
       end if
       call mpi_waitall(size(halo_swap_state%send_requests), halo_swap_state%send_requests, &
            MPI_STATUSES_IGNORE, ierr)
+      call check_mpi_success(ierr, "halo_communication_mod", "complete_nonblocking_halo_swap")
     end if
     halo_swap_state%swap_in_progress=.false.
   end subroutine complete_nonblocking_halo_swap
@@ -845,6 +848,7 @@ contains
                halo_swap_state%halo_swap_neighbours(i)%pid, 0, &
                current_state%parallel%neighbour_comm, &
                halo_swap_state%recv_requests(request_counter), ierr)
+          call check_mpi_success(ierr, "halo_communication_mod", "recv_all_halos")
           request_counter = request_counter + 1
        end if
        if (halo_swap_state%halo_swap_neighbours(i)%recv_corner_size .gt. 0) then
@@ -853,6 +857,7 @@ contains
                halo_swap_state%halo_swap_neighbours(i)%pid, 0, &
                current_state%parallel%neighbour_comm, &
                halo_swap_state%recv_requests(request_counter), ierr)
+          call check_mpi_success(ierr, "halo_communication_mod", "recv_all_halos")
           request_counter = request_counter + 1
        end if
     end do
@@ -958,6 +963,7 @@ contains
                halo_swap_state%halo_swap_neighbours(i)%pid, 0, &
                current_state%parallel%neighbour_comm, &
                halo_swap_state%send_requests(request_number), ierr)
+          call check_mpi_success(ierr, "halo_communication_mod", "send_all_halos")
           request_number = request_number+1
        end if
        if (halo_swap_state%halo_swap_neighbours(i)%send_corner_size .gt. 0) then
@@ -966,6 +972,7 @@ contains
                halo_swap_state%halo_swap_neighbours(i)%pid, 0, &
                current_state%parallel%neighbour_comm, &
                halo_swap_state%send_requests(request_number), ierr)
+          call check_mpi_success(ierr, "halo_communication_mod", "send_all_halos")
           request_number = request_number+1
        end if
     end do
