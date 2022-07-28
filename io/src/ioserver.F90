@@ -37,6 +37,7 @@ module io_server_mod
   use optionsdatabase_mod, only : options_get_logical
   use mpi, only : MPI_COMM_WORLD, MPI_STATUSES_IGNORE, MPI_BYTE
   use io_server_state_reader_mod, only : read_io_server_configuration
+  use mpi_error_handler_mod, only : check_mpi_success
   implicit none
 
 #ifndef TEST_MODE
@@ -365,7 +366,7 @@ contains
     integer, dimension(:), intent(in) :: arguments
     character, dimension(:), allocatable, intent(inout), optional :: data_buffer
 
-    integer :: configuration_send_request(2), ierr, number_data_definitions, this_monc_index, source
+    integer :: configuration_send_request(2), number_data_definitions, this_monc_index, source
 
     source=arguments(1)
     configuration_send_request=send_configuration_to_registree(source)
@@ -418,6 +419,7 @@ contains
          source, DATA_TAG, MPI_COMM_WORLD, srequest(1), ierr)
     call mpi_isend(registree_field_descriptions, size(registree_field_descriptions), mpi_type_field_description, &
          source, DATA_TAG, MPI_COMM_WORLD, srequest(2), ierr)
+    call check_mpi_success(ierr, "io_server", "send_configuration_to_registree")
     call unlock_mpi()
 
     send_configuration_to_registree=srequest    

@@ -12,6 +12,7 @@ module io_server_state_writer_mod
   use io_server_client_mod, only : pack_scalar_field
   use mpi, only : MPI_IN_PLACE, MPI_INT, MPI_LONG_LONG_INT, MPI_SUM, MPI_STATUS_IGNORE, mpi_wait
   use mpi_communication_mod, only : lock_mpi, unlock_mpi, wait_for_mpi_request
+  use mpi_error_handler_mod, only : check_mpi_success
   use netcdf_misc_mod, only : check_netcdf_status
   use timeaveraged_time_manipulation_mod, only : prepare_to_serialise_time_averaged_state, serialise_time_averaged_state
   use instantaneous_time_manipulation_mod, only : prepare_to_serialise_instantaneous_state, serialise_instantaneous_state
@@ -168,6 +169,7 @@ contains
     call mpi_iscan(MPI_IN_PLACE, my_writer_entry_start_point, size(my_writer_entry_start_point), MPI_LONG_LONG_INT, &
          MPI_SUM, io_configuration%io_communicator, my_writer_entry_start_request, ierr)
     call unlock_mpi()
+    call check_mpi_success(ierr, "io_state_writer", "prepare_io_server_state_storage")
   end subroutine prepare_io_server_state_storage
 
   !> Prepares to serialise the writer entry time points

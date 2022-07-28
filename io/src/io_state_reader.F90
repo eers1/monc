@@ -10,6 +10,7 @@ module io_server_state_reader_mod
   use writer_types_mod, only : writer_type, unserialise_writer_type
   use logging_mod, only : LOG_ERROR, LOG_WARN, log_log, log_master_log
   use mpi, only : mpi_comm_rank, mpi_comm_size
+  use mpi_error_handler_mod, only : check_mpi_success
   use data_utils_mod, only : unpack_scalar_integer_from_bytedata, unpack_scalar_dp_real_from_bytedata
   use timeaveraged_time_manipulation_mod, only : unserialise_time_averaged_state
   use instantaneous_time_manipulation_mod, only : unserialise_instantaneous_state
@@ -79,6 +80,7 @@ contains
 
     call mpi_comm_rank(io_communicator_arg, my_io_server_rank, ierr)
     call mpi_comm_size(io_communicator_arg, number_io_server, ierr)
+    call check_mpi_success(ierr, "io_server_state_reader_mod", "read_io_server_configuration")
     call check_netcdf_status(nf90_open(path = checkpoint_filename, mode = nf90_nowrite, ncid = ncid))
     call check_netcdf_status(nf90_inq_dimid(ncid, "entries_directory_dim", dim_id), found)
     if (.not. found) then

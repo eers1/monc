@@ -9,7 +9,9 @@ module threadpool_mod
   use conversions_mod, only : conv_to_string
   use logging_mod, only : LOG_ERROR, LOG_WARN, log_log
   use configuration_parser_mod, only : io_configuration_type
-  use mpi, only : MPI_THREAD_MULTIPLE, MPI_THREAD_SERIALIZED
+  use mpi, only : MPI_THREAD_MULTIPLE, MPI_THREAD_SERIALIZED, mpi_comm_world, mpi_error_string, mpi_abort, &
+          mpi_max_error_string
+  use mpi_error_handler_mod, only : check_mpi_success
   implicit none
 
 #ifndef TEST_MODE
@@ -230,6 +232,6 @@ contains
 
     if (ierr .ne. 0) then
       call log_log(LOG_ERROR, "Pthreads error in IO server, error code="//conv_to_string(ierr))
-    end if    
+    end if
   end subroutine check_thread_status  
 end module threadpool_mod

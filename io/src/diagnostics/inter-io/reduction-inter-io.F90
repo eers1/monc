@@ -16,6 +16,7 @@ module reduction_inter_io_mod
   use inter_io_specifics_mod, only : handle_completion, register_inter_io_communication, find_inter_io_from_name, &
        package_inter_io_communication_message, unpackage_inter_io_communication_message
   use mpi, only : MPI_DOUBLE_PRECISION, MPI_INT, MPI_ANY_SOURCE, MPI_REQUEST_NULL, MPI_STATUS_IGNORE, MPI_CHARACTER, MPI_BYTE
+  use mpi_error_handler_mod, only : check_mpi_success
   use mpi_communication_mod, only : lock_mpi, unlock_mpi, wait_for_mpi_request
   implicit none
 
@@ -289,6 +290,7 @@ contains
              MPI_BYTE, reduction_progress%root, &
              io_configuration%inter_io_communications(inter_io_comm_index)%message_tag, &
              io_configuration%io_communicator, reduction_progress%async_handle, ierr)
+        call check_mpi_success(ierr, "reduction_inter_io_mod", "handle_local_moncs_completed_collective")
         call unlock_mpi()
         ! Deallocate the current value as this is finished with and has been packed into the send buffer
         if (allocated(reduction_progress%values)) deallocate(reduction_progress%values)

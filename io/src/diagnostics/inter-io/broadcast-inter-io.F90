@@ -15,6 +15,7 @@ module broadcast_inter_io_mod
   use inter_io_specifics_mod, only : handle_completion, register_inter_io_communication, find_inter_io_from_name, &
        package_inter_io_communication_message, unpackage_inter_io_communication_message
   use mpi, only : MPI_DOUBLE_PRECISION, MPI_INT, MPI_ANY_SOURCE, MPI_REQUEST_NULL, MPI_STATUSES_IGNORE, MPI_CHARACTER, MPI_BYTE
+  use mpi_error_handler_mod, only : check_mpi_success
   use mpi_communication_mod, only : lock_mpi, unlock_mpi, waitall_for_mpi_requests
   implicit none
 
@@ -199,6 +200,7 @@ contains
           call mpi_isend(broadcast_item%send_buffer, size(broadcast_item%send_buffer), MPI_BYTE, i, &
                io_configuration%inter_io_communications(inter_io_comm_index)%message_tag, &
                io_configuration%io_communicator, broadcast_item%send_requests(i+1), ierr)
+          call check_mpi_success(ierr, "broadcast_inter_io_mod", "perform_inter_io_broadcast")
           call unlock_mpi()
         else
           broadcast_item%send_requests(i+1)=MPI_REQUEST_NULL
@@ -311,6 +313,7 @@ contains
           call lock_mpi()
           call mpi_testall(size(specific_broadcast_item_at_index%send_requests), specific_broadcast_item_at_index%send_requests, &
                completion_flag, MPI_STATUSES_IGNORE, ierr)
+          call check_mpi_success(ierr, "broadcast_inter_io_mod", "clean_broadcast_progress")
           call unlock_mpi()
           if (completion_flag == 1) then
             deallocate(specific_broadcast_item_at_index%send_requests)

@@ -30,6 +30,7 @@ module netcdf_filetype_writer_mod
   use optionsdatabase_mod, only : options_size, options_value_at, options_key_at
   use netcdf_misc_mod, only : check_netcdf_status
   use mpi, only : MPI_STATUS_IGNORE, MPI_REQUEST_NULL, MPI_INT
+  use mpi_error_handler_mod, only : check_mpi_success
 
   implicit none
 
@@ -601,6 +602,7 @@ contains
             call lock_mpi()
             call check_netcdf_status(nf90_put_var(file_state%ncid, field_id, data_value%values, start=start, count=count))
             call unlock_mpi()
+
             call check_thread_status(forthread_mutex_unlock(netcdf_mutex))
             call check_thread_status(forthread_mutex_unlock(file_state%mutex))
             deallocate(data_value%values)
@@ -1257,6 +1259,7 @@ contains
     call date_and_time(values=date_values)
     call lock_mpi()
     call mpi_bcast(date_values, 8, MPI_INT, 0, io_configuration%io_communicator, ierr)
+    call check_mpi_success(ierr, "netcdf_filetype", "write_out_global_attributes")
     call unlock_mpi()
     date_time=trim(conv_to_string(date_values(3)))//"/"//&
          trim(conv_to_string(date_values(2)))//"/"//trim(conv_to_string(date_values(1)))//" "//trim(conv_to_string(&

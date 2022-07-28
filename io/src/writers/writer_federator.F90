@@ -34,6 +34,7 @@ module writer_federator_mod
   use grids_mod, only : Z_INDEX, Y_INDEX, X_INDEX
   use mpi, only : MPI_INT, MPI_MAX
   use mpi_communication_mod, only : lock_mpi, unlock_mpi
+  use mpi_error_handler_mod, only : check_mpi_success
   implicit none
 
 #ifndef TEST_MODE
@@ -1538,6 +1539,7 @@ contains
     call mpi_iallreduce(number_distinct_writes, field_to_write_information%max_num_collective_writes, 1, MPI_INT, MPI_MAX, &
          io_configuration%io_communicator, field_to_write_information%max_num_collective_writes_request_handle, ierr)
     call unlock_mpi()
+    call check_mpi_success(ierr, "writer_federator", "initialise_contiguous_data_regions")
   end subroutine initialise_contiguous_data_regions
 
   !> Retrieves the number of common starting points that match a specific input value
