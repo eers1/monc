@@ -11,6 +11,7 @@ module conditional_diagnostics_whole_mod
   use grids_mod, only : Z_INDEX
   use datadefn_mod, only : PRECISION_TYPE, DEFAULT_PRECISION
   use mpi, only : MPI_SUM, MPI_IN_PLACE, MPI_INT, MPI_REAL, MPI_DOUBLE
+  use mpi_error_handler_mod, only : check_mpi_success
   use missing_data_mod, only: rmdi
   use optionsdatabase_mod, only : options_get_integer
 
@@ -65,9 +66,11 @@ contains
     if (current_state%parallel%my_rank == 0) then
       call mpi_reduce(MPI_IN_PLACE , CondDiags_tot, ncond*2*ndiag*current_state%local_grid%size(Z_INDEX), &
                       PRECISION_TYPE, MPI_SUM, 0, current_state%parallel%monc_communicator, ierr)
+      call check_mpi_success(ierr, "conditional_diagnostics_whole_mod", "timestep_callback")
     else
       call mpi_reduce(CondDiags_tot, CondDiags_tot, ncond*2*ndiag*current_state%local_grid%size(Z_INDEX), &
                       PRECISION_TYPE, MPI_SUM, 0, current_state%parallel%monc_communicator, ierr)
+      call check_mpi_success(ierr, "conditional_diagnostics_whole_mod", "timestep_callback")
     end if
 
     !> Average summed diagnostics over the domain by dividing the total diagnostic for each condition 
@@ -103,6 +106,7 @@ contains
     !> Broadcast the process-fractional solution to all processes.
     call mpi_bcast(CondDiags_tot,  ncond*2*ndiag*current_state%local_grid%size(Z_INDEX), &
                    PRECISION_TYPE, 0, current_state%parallel%monc_communicator, ierr)
+    call check_mpi_success(ierr, "conditional_diagnostics_whole_mod", "timestep_callback")
 
   end subroutine timestep_callback
 

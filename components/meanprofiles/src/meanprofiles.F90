@@ -5,6 +5,7 @@ module meanprofiles_mod
   use grids_mod, only : X_INDEX, Y_INDEX, Z_INDEX
   use datadefn_mod, only : DEFAULT_PRECISION, PRECISION_TYPE
   use mpi, only : MPI_SUM, MPI_IN_PLACE
+  use mpi_error_handler_mod, only : check_mpi_success
   implicit none
 
 #ifndef TEST_MODE
@@ -165,5 +166,6 @@ contains
 
     call mpi_allreduce(MPI_IN_PLACE, bartmp, bar_fields*current_state%local_grid%size(Z_INDEX), PRECISION_TYPE, MPI_SUM, &
          current_state%parallel%monc_communicator, ierr)
+    call check_mpi_success(ierr, "meanprofiles_mod", "calculate_sum_profiles")
   end subroutine calculate_sum_profiles
 end module meanprofiles_mod

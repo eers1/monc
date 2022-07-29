@@ -11,6 +11,7 @@ module checkpointer_mod
   use logging_mod, only : LOG_INFO, log_master_log, log_master_newline
   use checkpointer_write_checkpoint_mod, only : write_checkpoint_file
   use checkpointer_read_checkpoint_mod, only : read_checkpoint_file
+  use mpi_error_handler_mod, only : check_mpi_success
   implicit none
 
 #ifndef TEST_MODE
@@ -99,6 +100,7 @@ contains
     end if
     ! Barrier here to ensure all processes dumped before log_log stats (is there a better way?)
     call mpi_barrier(current_state%parallel%monc_communicator, ierr)
+    call check_mpi_success(ierr, "checkpointer_mod", "perform_checkpoint_dump")
     call cpu_time(end_dump_time)
     call log_dump_stats(current_state, start_dump_time, end_dump_time)
   end subroutine perform_checkpoint_dump

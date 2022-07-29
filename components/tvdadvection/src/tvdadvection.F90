@@ -12,6 +12,7 @@ module tvdadvection_mod
   use optionsdatabase_mod, only : options_get_string, options_get_integer
   use collections_mod, only : map_type
   use mpi, only : MPI_REQUEST_NULL, MPI_STATUS_IGNORE
+  use mpi_error_handler_mod, only : check_mpi_success
   use q_indices_mod, only: get_q_index, standard_q_names
   ! Some tvd diagnostic terms 
   use def_tvd_diagnostic_terms, only: tvd_dgs_terms 
@@ -938,6 +939,7 @@ contains
     if (y_local_index == local_grid%local_domain_end_index(Y_INDEX) .and. parallel%my_coords(Y_INDEX) == 0 .and. &
          field%async_flux_handle .ne. MPI_REQUEST_NULL) then
       call mpi_wait(field%async_flux_handle, MPI_STATUS_IGNORE, ierr)
+      call check_mpi_success(ierr, "tvdadvection_mod", "complete_y_flux_wrap_send_if_required")
     end if
   end subroutine complete_y_flux_wrap_send_if_required
 
@@ -964,6 +966,7 @@ contains
       if (parallel%my_rank .ne. local_grid%neighbours(Y_INDEX,1)) then      
         call mpi_isend(field%flux_y_buffer, local_grid%size(Z_INDEX), PRECISION_TYPE, local_grid%neighbours(Y_INDEX,1), 0, &
              parallel%neighbour_comm, field%async_flux_handle, ierr)
+        call check_mpi_success(ierr, "tvdadvection_mod", "register_y_flux_wrap_send_if_required")
       end if
     end if
   end subroutine register_y_flux_wrap_send_if_required
@@ -986,6 +989,7 @@ contains
          parallel%dim_sizes(Y_INDEX)-1) then
       if (field%async_flux_handle .ne. MPI_REQUEST_NULL) then
         call mpi_wait(field%async_flux_handle, MPI_STATUS_IGNORE, ierr)
+        call check_mpi_success(ierr, "tvdadvection_mod", "complete_y_flux_wrap_recv_if_required")
       end if
       flux_y(:) = field%flux_y_buffer(:)
     end if
@@ -1013,6 +1017,7 @@ contains
         if (.not. allocated(field%flux_y_buffer)) allocate(field%flux_y_buffer(local_grid%size(Z_INDEX)))
         call mpi_irecv(field%flux_y_buffer, local_grid%size(Z_INDEX), PRECISION_TYPE, local_grid%neighbours(Y_INDEX,3), 0, &
              parallel%neighbour_comm, field%async_flux_handle, ierr)
+        call check_mpi_success(ierr, "tvdadvection_mod", "register_y_flux_wrap_recv_if_required")
       end if
     end if
   end subroutine register_y_flux_wrap_recv_if_required

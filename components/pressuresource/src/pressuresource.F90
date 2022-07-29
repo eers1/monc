@@ -12,6 +12,7 @@ module pressuresource_mod
   use registry_mod, only : is_component_enabled
   use logging_mod, only : LOG_ERROR, log_master_log
   use mpi, only : MPI_REQUEST_NULL
+  use mpi_error_handler_mod, only : check_mpi_success
   implicit none
 
 #ifndef TEST_MODE
@@ -147,6 +148,7 @@ contains
     else
       call mpi_isend(send_buffer_x, size(send_buffer_x), PRECISION_TYPE, current_state%local_grid%neighbours(X_INDEX,3), &
            10, current_state%parallel%neighbour_comm, current_state%psrce_x_hs_send_request, ierr)
+      call check_mpi_success(ierr, "pressuresource_mod", "send_neighbouring_pressure_data")
     end if
 #endif
 #ifdef V_ACTIVE
@@ -155,6 +157,7 @@ contains
     else
       call mpi_isend(send_buffer_y, size(send_buffer_y), PRECISION_TYPE, current_state%local_grid%neighbours(Y_INDEX,3), &
            10, current_state%parallel%neighbour_comm, current_state%psrce_y_hs_send_request, ierr)
+      call check_mpi_success(ierr, "pressuresource_mod", "send_neighbouring_pressure_data")
     end if
 #endif
   end subroutine send_neighbouring_pressure_data
@@ -171,6 +174,7 @@ contains
       call mpi_irecv(current_state%psrce_recv_buffer_x, size(current_state%psrce_recv_buffer_x), PRECISION_TYPE, &
            current_state%local_grid%neighbours(X_INDEX,2), 10, current_state%parallel%neighbour_comm, &
            current_state%psrce_x_hs_recv_request, ierr)
+      call check_mpi_success(ierr, "pressuresource_mod", "send_neighbouring_pressure_data")
     end if    
 #endif
 #ifdef V_ACTIVE
@@ -178,6 +182,7 @@ contains
       call mpi_irecv(current_state%psrce_recv_buffer_y, size(current_state%psrce_recv_buffer_y), PRECISION_TYPE, &
            current_state%local_grid%neighbours(Y_INDEX,2), 10, current_state%parallel%neighbour_comm, &
            current_state%psrce_y_hs_recv_request, ierr)
+      call check_mpi_success(ierr, "pressuresource_mod", "send_neighbouring_pressure_data")
     end if    
 #endif
   end subroutine register_neighbouring_pressure_data_recv

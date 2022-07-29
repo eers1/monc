@@ -12,7 +12,8 @@ module cfltest_mod
   use conversions_mod, only : conv_to_string
   use optionsdatabase_mod, only : options_get_integer, options_get_real, options_get_logical
   use grids_mod, only : Z_INDEX, Y_INDEX, X_INDEX
-  use mpi, only : MPI_MAX, MPI_MIN  
+  use mpi, only : MPI_MAX, MPI_MIN 
+  use mpi_error_handler_mod, only : check_mpi_success 
   implicit none
 
 #ifndef TEST_MODE
@@ -206,10 +207,16 @@ contains
     integer :: ierr
 
     call mpi_allreduce(local_zumax, global_zumax, 1, PRECISION_TYPE, MPI_MAX, parallel_state%monc_communicator, ierr)
+    call check_mpi_success(ierr, "cfltest_mod", "get_global_values")
     call mpi_allreduce(local_zvmax, global_zvmax, 1, PRECISION_TYPE, MPI_MAX, parallel_state%monc_communicator, ierr)
+    call check_mpi_success(ierr, "cfltest_mod", "get_global_values")
     call mpi_allreduce(local_cvel_z, global_cvel_z, 1, PRECISION_TYPE, MPI_MAX, parallel_state%monc_communicator, ierr)
+    call check_mpi_success(ierr, "cfltest_mod", "get_global_values")
     call mpi_allreduce(local_cvis, global_cvis, 1, PRECISION_TYPE, MPI_MAX, parallel_state%monc_communicator, ierr)
+    call check_mpi_success(ierr, "cfltest_mod", "get_global_values")
     call mpi_allreduce(local_zumin, global_zumin, 1, PRECISION_TYPE, MPI_MIN, parallel_state%monc_communicator, ierr)
+    call check_mpi_success(ierr, "cfltest_mod", "get_global_values")
     call mpi_allreduce(local_zvmin, global_zvmin, 1, PRECISION_TYPE, MPI_MIN, parallel_state%monc_communicator, ierr)
+    call check_mpi_success(ierr, "cfltest_mod", "get_global_values")
   end subroutine get_global_values
 end module cfltest_mod

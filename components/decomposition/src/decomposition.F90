@@ -11,6 +11,7 @@ module decomposition_mod
        log_master_log, log_log
   use optionsdatabase_mod, only : options_get_string, options_get_integer
   use mpi
+  use mpi_error_handler_mod, only : check_mpi_success
   implicit none
 
 #ifndef TEST_MODE
@@ -72,6 +73,7 @@ contains
 
     distributed_dims= (/0,0/)
     call mpi_dims_create(current_state%parallel%processes, 2, distributed_dims, ierr)
+    call check_mpi_success(ierr, "decomposition_mod", "two_dim_decomposition")
 
     current_state%parallel%dim_sizes(Z_INDEX)=1
     current_state%parallel%dim_sizes(Y_INDEX) = distributed_dims(1)
@@ -86,8 +88,9 @@ contains
     
     call mpi_cart_create(current_state%parallel%monc_communicator, 2, (/distributed_dims(1), distributed_dims(2)/),&
          (/.false., .false./), .false., current_state%parallel%neighbour_comm, ierr)
+    call check_mpi_success(ierr, "decomposition_mod", "two_dim_decomposition")
     call mpi_cart_coords(current_state%parallel%neighbour_comm, current_state%parallel%my_rank, 2, coords, ierr)
-
+    call check_mpi_success(ierr, "decomposition_mod", "two_dim_decomposition")
     call apply_halo_information_and_allocate_neighbours(current_state)
     call apply_z_dimension_information(current_state)
 
@@ -132,15 +135,18 @@ contains
 
     call mpi_cart_shift(current_state%parallel%neighbour_comm, 0, 1, current_state%local_grid%neighbours(Y_INDEX,1), &
          current_state%local_grid%neighbours(Y_INDEX,3), ierr)
+    call check_mpi_success(ierr, "decomposition_mod", "apply_two_dim_neighbour_information")
     if (current_state%local_grid%neighbours(Y_INDEX,1) .lt. 0) then
       call mpi_cart_rank(current_state%parallel%neighbour_comm,&
            (/y_procs-1, coords(2)/),  current_state%local_grid%neighbours(Y_INDEX,1), ierr)
+      call check_mpi_success(ierr, "decomposition_mod", "apply_two_dim_neighbour_information")
       current_state%parallel%wrapped_around(Y_INDEX, 1)=.true.
     end if
     
     if (current_state%local_grid%neighbours(Y_INDEX,3) .lt. 0) then
       call mpi_cart_rank(current_state%parallel%neighbour_comm, &
          (/0, coords(2)/),  current_state%local_grid%neighbours(Y_INDEX,3), ierr)
+      call check_mpi_success(ierr, "decomposition_mod", "apply_two_dim_neighbour_information")
       current_state%parallel%wrapped_around(Y_INDEX, 2)=.true.
     end if    
 
@@ -148,14 +154,17 @@ contains
     call mpi_cart_shift(current_state%parallel%neighbour_comm, 1, 1, &
          current_state%local_grid%neighbours(X_INDEX,1), &
          current_state%local_grid%neighbours(X_INDEX,3), ierr)
+    call check_mpi_success(ierr, "decomposition_mod", "apply_two_dim_neighbour_information")
     if (current_state%local_grid%neighbours(X_INDEX,1) .lt. 0) then
       call mpi_cart_rank(current_state%parallel%neighbour_comm, &
          (/coords(1), x_procs-1/),  current_state%local_grid%neighbours(X_INDEX,1), ierr)
+      call check_mpi_success(ierr, "decomposition_mod", "apply_two_dim_neighbour_information")
       current_state%parallel%wrapped_around(X_INDEX, 1)=.true.
     end if
     if (current_state%local_grid%neighbours(X_INDEX,3) .lt. 0) then
       call mpi_cart_rank(current_state%parallel%neighbour_comm, &
          (/coords(1), 0/),  current_state%local_grid%neighbours(X_INDEX,3), ierr)
+      call check_mpi_success(ierr, "decomposition_mod", "apply_two_dim_neighbour_information")
       current_state%parallel%wrapped_around(X_INDEX, 2)=.true.
     end if
 
@@ -177,18 +186,22 @@ contains
          (/merge(coords(1)-1, y_procs-1, coords(1) .ge. 1),   &
          merge(coords(2)-1, x_procs-1, coords(2) .ge. 1)/),   &
          current_state%local_grid%corner_neighbours(1,1), ierr)
+    call check_mpi_success(ierr, "decomposition_mod", "apply_two_dim_neighbour_information")
     call mpi_cart_rank(current_state%parallel%neighbour_comm, &
          (/merge(coords(1)-1, y_procs-1, coords(1) .ge. 1),   &
          merge(coords(2)+1, 0, coords(2) .lt. x_procs-1)/),   &
          current_state%local_grid%corner_neighbours(2,1), ierr)
+    call check_mpi_success(ierr, "decomposition_mod", "apply_two_dim_neighbour_information")
     call mpi_cart_rank(current_state%parallel%neighbour_comm, &
          (/merge(coords(1)+1, 0, coords(1) .lt. y_procs-1),   &
          merge(coords(2)-1, x_procs-1, coords(2) .ge. 1)/),   &
          current_state%local_grid%corner_neighbours(3,1), ierr)
+    call check_mpi_success(ierr, "decomposition_mod", "apply_two_dim_neighbour_information")
     call mpi_cart_rank(current_state%parallel%neighbour_comm, &
          (/merge(coords(1)+1, 0, coords(1) .lt. y_procs-1),   &
          merge(coords(2)+1, 0, coords(2) .lt. x_procs-1)/),   &
          current_state%local_grid%corner_neighbours(4,1), ierr)
+    call check_mpi_success(ierr, "decomposition_mod", "apply_two_dim_neighbour_information")
     
     !! TODO: hardcoded for halo depth two?
     current_state%local_grid%corner_neighbours(:,2)=current_state%local_grid%corner_neighbours(:,1)

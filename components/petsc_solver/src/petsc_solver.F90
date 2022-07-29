@@ -19,6 +19,7 @@ module petsc_solver_mod
   use petscksp
   use petscsys
   use petscdmda
+  use mpi_error_handler_mod, only : check_mpi_success
   implicit none
 
 #ifndef TEST_MODE
@@ -446,6 +447,7 @@ module petsc_solver_mod
     combined_handles(1)=current_state%psrce_x_hs_recv_request
     combined_handles(2)=current_state%psrce_y_hs_recv_request
     call mpi_waitall(2, combined_handles, MPI_STATUSES_IGNORE, ierr)
+    call check_mpi_success(ierr, "petsc_solver_mod", "complete_psrce_calculation")
 
     do j=current_state%local_grid%local_domain_start_index(Y_INDEX), current_state%local_grid%local_domain_end_index(Y_INDEX)
       do k=2,current_state%local_grid%size(Z_INDEX)
@@ -472,6 +474,7 @@ module petsc_solver_mod
     combined_handles(1)=current_state%psrce_x_hs_send_request
     combined_handles(2)=current_state%psrce_y_hs_send_request
     call mpi_waitall(2, combined_handles, MPI_STATUSES_IGNORE, ierr)
+    call check_mpi_success(ierr, "petsc_solver_mod", "complete_psrce_calculation")
   end subroutine complete_psrce_calculation 
 
   !> Copies the p field data to halo buffers for a specific process in a dimension and halo cell

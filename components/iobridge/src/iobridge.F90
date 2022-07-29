@@ -23,6 +23,7 @@ module iobridge_mod
        build_mpi_type_field_description, build_mpi_type_definition_description, populate_mpi_type_extents, append_mpi_datatype, &
        get_mpi_datatype_from_internal_representation, pack_scalar_field, pack_array_field, pack_map_field
   use mpi, only : MPI_COMM_WORLD, MPI_INT, MPI_BYTE, MPI_REQUEST_NULL, MPI_STATUSES_IGNORE, MPI_STATUS_IGNORE, MPI_STATUS_SIZE
+  use mpi_error_handler_mod, only : check_mpi_success
   use q_indices_mod, only : q_metadata_type, get_max_number_q_indices, get_indices_descriptor, get_number_active_q_indices
 
   use conditional_diagnostics_column_mod, only : ncond, ndiag, cond_request, diag_request, cond_long, diag_long
@@ -97,6 +98,7 @@ contains
     call mpi_type_free(mpi_type_data_sizing_description, ierr)
     call mpi_type_free(mpi_type_definition_description, ierr)
     call mpi_type_free(mpi_type_field_description, ierr)
+    call check_mpi_success(ierr, "iobridge_mod", "init_callback")
 
     call build_mpi_data_types()
   end subroutine init_callback
@@ -132,6 +134,7 @@ contains
          data_definitions(data_index)%dump_requests(2) .ne. MPI_REQUEST_NULL) then
       ! Here wait for previous data dump to complete (consider extending to using buffers for performance)
       call mpi_waitall(2, data_definitions(data_index)%dump_requests, MPI_STATUSES_IGNORE, ierr)
+      call check_mpi_success(ierr, "iobridge_mod", "send_data_to_io_server")
     end if
 
     ! Pack the send buffer and send it to the IO server
@@ -143,9 +146,11 @@ contains
     call mpi_issend(data_definitions(data_index)%command_data, 1, MPI_INT, &
             current_state%parallel%corresponding_io_server_process, &
          COMMAND_TAG, MPI_COMM_WORLD, data_definitions(data_index)%dump_requests(1), ierr)
+    call check_mpi_success(ierr, "iobridge_mod", "send_data_to_io_server")
     call mpi_issend(data_definitions(data_index)%send_buffer, 1, data_definitions(data_index)%mpi_datatype, &
          current_state%parallel%corresponding_io_server_process, DATA_TAG+data_index, MPI_COMM_WORLD, &
          data_definitions(data_index)%dump_requests(2), ierr)
+    call check_mpi_success(ierr, "iobridge_mod", "send_data_to_io_server")
   end subroutine send_data_to_io_server
 
   !> Finalisation call back, called at the end of the model run
@@ -165,12 +170,15 @@ contains
       if (data_definitions(i)%dump_requests(1) .ne. MPI_REQUEST_NULL .or. &
            data_definitions(i)%dump_requests(2) .ne. MPI_REQUEST_NULL) then
         call mpi_waitall(2, data_definitions(i)%dump_requests, MPI_STATUSES_IGNORE, ierr)
+        call check_mpi_success(ierr, "iobridge_mod", "finalisation_callback")
       end if
       if (allocated(data_definitions(i)%send_buffer)) deallocate(data_definitions(i)%send_buffer)
       call mpi_type_free(data_definitions(i)%mpi_datatype, ierr)
+      call check_mpi_success(ierr, "iobridge_mod", "finalisation_callback")
     end do
     call mpi_send(DEREGISTER_COMMAND, 1, MPI_INT, current_state%parallel%corresponding_io_server_process, &
          COMMAND_TAG, MPI_COMM_WORLD, ierr)
+    call check_mpi_success(ierr, "iobridge_mod", "finalisation_callback")
   end subroutine finalisation_callback
 
   !> Builds the MPI data types that correspond to the field descriptions and sizings
@@ -260,8 +268,11 @@ contains
     end if
 
     call mpi_type_struct(type_counts, block_counts, offsets, old_types, specific_data_definition%mpi_datatype, ierr)
+    call check_mpi_success(ierr, "iobridge_mod", "build_mpi_data_type_for_definition")
     call mpi_type_commit(specific_data_definition%mpi_datatype, ierr)
+    call check_mpi_success(ierr, "iobridge_mod", "build_mpi_data_type_for_definition")
     call mpi_type_size(specific_data_definition%mpi_datatype, tempsize, ierr)
+    call check_mpi_success(ierr, "iobridge_mod", "build_mpi_data_type_for_definition")
     build_mpi_data_type_for_definition=tempsize
   end function build_mpi_data_type_for_definition
 
@@ -472,6 +483,7 @@ contains
     allocate(buffer(buffer_size))
     request_handles(2)=send_general_monc_information_to_server(current_state, buffer)
     call mpi_waitall(2, request_handles, MPI_STATUSES_IGNORE, ierr)
+    call check_mpi_success(ierr, "iobridge_mod", "send_monc_specific_data_to_server")
     deallocate(data_description)
     deallocate(buffer)
   end subroutine send_monc_specific_data_to_server
@@ -502,6 +514,7 @@ contains
 
     call mpi_isend(data_description, next_index-1, mpi_type_data_sizing_description, &
          current_state%parallel%corresponding_io_server_process, DATA_TAG, MPI_COMM_WORLD, request_handle, ierr)
+    call check_mpi_success(ierr, "iobridge_mod", "send_data_field_sizes_to_server")
     send_data_field_sizes_to_server=request_handle
   end function send_data_field_sizes_to_server
 
@@ -555,6 +568,7 @@ contains
 
     call mpi_isend(buffer, current_loc-1, MPI_BYTE, current_state%parallel%corresponding_io_server_process, &
          DATA_TAG, MPI_COMM_WORLD, request_handle, ierr)
+    call check_mpi_success(ierr, "iobridge_mod", "send_general_monc_information_to_server")
     send_general_monc_information_to_server=request_handle
   end function send_general_monc_information_to_server
 
@@ -656,18 +670,23 @@ contains
 
     call mpi_send(REGISTER_COMMAND, 1, MPI_INT, current_state%parallel%corresponding_io_server_process, &
          COMMAND_TAG, MPI_COMM_WORLD, ierr)
+    call check_mpi_success(ierr, "iobridge_mod", "register_with_io_server")
 
     call mpi_probe(current_state%parallel%corresponding_io_server_process, DATA_TAG, MPI_COMM_WORLD, status, ierr)
+    call check_mpi_success(ierr, "iobridge_mod", "register_with_io_server")
     call mpi_get_count(status, mpi_type_definition_description, number_defns, ierr)
+    call check_mpi_success(ierr, "iobridge_mod", "register_with_io_server")
     allocate(definition_descriptions(number_defns))
 
     call mpi_recv(definition_descriptions, number_defns, mpi_type_definition_description, &
          current_state%parallel%corresponding_io_server_process, DATA_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE, ierr)
+    call check_mpi_success(ierr, "iobridge_mod", "register_with_io_server")
     number_fields=get_total_number_of_fields(definition_descriptions, number_defns)
 
     allocate(field_descriptions(number_fields))
     call mpi_recv(field_descriptions, number_fields, mpi_type_field_description, &
          current_state%parallel%corresponding_io_server_process, DATA_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE, ierr)
+    call check_mpi_success(ierr, "iobridge_mod", "register_with_io_server")
     call populate_data_definition_configuration(definition_descriptions, number_defns, field_descriptions, number_fields)
     deallocate(definition_descriptions)
   end subroutine register_with_io_server

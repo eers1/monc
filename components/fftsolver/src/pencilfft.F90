@@ -12,6 +12,7 @@ module pencil_fft_mod
   use fftw_mod, only : C_DOUBLE_COMPLEX, C_PTR, FFTW_BACKWARD, FFTW_FORWARD, FFTW_ESTIMATE, fftw_plan_many_dft_r2c, &
        fftw_plan_many_dft_c2r, fftw_execute_dft_c2r, fftw_execute_dft_r2c, fftw_destroy_plan
   use mpi, only : MPI_DOUBLE_COMPLEX, MPI_INT, MPI_COMM_SELF
+  use mpi_error_handler_mod, only : check_mpi_success
   implicit none
 
 #ifndef TEST_MODE
@@ -61,20 +62,26 @@ contains
 
     if (current_state%parallel%dim_sizes(Y_INDEX) .gt. 1 .and. current_state%parallel%dim_sizes(X_INDEX) .gt. 1) then
       call mpi_cart_sub(current_state%parallel%neighbour_comm, (/1,0/), dim_y_comm, ierr)
+      call check_mpi_success(ierr, "pencil_fft_mod", "initialise_pencil_fft")
       call mpi_cart_sub(current_state%parallel%neighbour_comm, (/0,1/), dim_x_comm, ierr)
+      call check_mpi_success(ierr, "pencil_fft_mod", "initialise_pencil_fft")
 
       call mpi_allgather(current_state%local_grid%size(Y_INDEX), 1, MPI_INT, y_distinct_sizes, 1, MPI_INT, dim_y_comm, ierr)
+      call check_mpi_success(ierr, "pencil_fft_mod", "initialise_pencil_fft")
       call mpi_allgather(current_state%local_grid%size(X_INDEX), 1, MPI_INT, x_distinct_sizes, 1, MPI_INT, dim_x_comm, ierr)
+      call check_mpi_success(ierr, "pencil_fft_mod", "initialise_pencil_fft")
     else if (current_state%parallel%dim_sizes(Y_INDEX) .gt. 1) then
       dim_y_comm=current_state%parallel%monc_communicator
       dim_x_comm=MPI_COMM_SELF
       call mpi_allgather(current_state%local_grid%size(Y_INDEX), 1, MPI_INT, y_distinct_sizes, 1, MPI_INT, dim_y_comm, ierr)
       x_distinct_sizes=current_state%local_grid%size(X_INDEX)
+      call check_mpi_success(ierr, "pencil_fft_mod", "initialise_pencil_fft")
     else if (current_state%parallel%dim_sizes(X_INDEX) .gt. 1) then      
       dim_y_comm=MPI_COMM_SELF
       dim_x_comm=current_state%parallel%monc_communicator
       y_distinct_sizes=current_state%local_grid%size(Y_INDEX)
       call mpi_allgather(current_state%local_grid%size(X_INDEX), 1, MPI_INT, x_distinct_sizes, 1, MPI_INT, dim_x_comm, ierr)
+      call check_mpi_success(ierr, "pencil_fft_mod", "initialise_pencil_fft")
     else
       dim_y_comm=MPI_COMM_SELF
       dim_x_comm=MPI_COMM_SELF
@@ -101,6 +108,7 @@ contains
 
     if (dim_y_comm .ne. MPI_COMM_SELF .and. dim_y_comm .ne. monc_communicator) call mpi_comm_free(dim_y_comm, ierr)
     if (dim_x_comm .ne. MPI_COMM_SELF .and. dim_x_comm .ne. monc_communicator) call mpi_comm_free(dim_x_comm, ierr)
+    call check_mpi_success(ierr, "pencil_fft_mod", "finalise_pencil_fft")
     deallocate(buffer1, buffer2, real_buffer1, real_buffer2, real_buffer3, fft_in_y_buffer , fft_in_x_buffer)
   end subroutine finalise_pencil_fft  
 
@@ -373,6 +381,7 @@ contains
     call mpi_alltoallv(real_temp, transposition_description%send_sizes, transposition_description%send_offsets, &
          PRECISION_TYPE, real_temp2, transposition_description%recv_sizes, transposition_description%recv_offsets, &
          PRECISION_TYPE, communicator, ierr)
+    call check_mpi_success(ierr, "pencil_fft_mod", "transpose_to_pencil")
     call contiguise_data(transposition_description, (/source_dims(3), source_dims(2), source_dims(1)/), direction, &
          source_real_buffer=real_temp2, target_real_buffer=target_data)
     deallocate(real_temp, real_temp2)   
