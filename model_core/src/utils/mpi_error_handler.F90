@@ -7,17 +7,17 @@ module mpi_error_handler_mod
   public check_mpi_success
 contains
 
-  subroutine check_mpi_success(ierr, mod_name, sub_name)
-    integer :: ierr, length, temp !, rank
+  subroutine check_mpi_success(ierr, mod_name, sub_name, mpi_call)
+    integer :: ierr, length, temp
     character (len = mpi_max_error_string) :: message
-    character (len = 40):: mod_name, sub_name
+    character (len = *):: mod_name, sub_name, mpi_call
       
     if (ierr /= mpi_success) then
-!      call mpi_comm_rank(mpi_comm_world, rank)
       call mpi_error_string(ierr, message, length, temp)
-!      call log_log(LOG_INFO, "Rank is: "//conv_to_string(rank))
-      call log_log(LOG_INFO, "MPI error message: "//message//" with error code: "//conv_to_string(ierr))
-      call log_log(LOG_INFO, "MPI error has occurred, check status called from "//mod_name//" and subroutine "//sub_name)
+      call log_log(LOG_INFO, "MPI error has occurred with error code: "//conv_to_string(ierr))
+      call log_log(LOG_INFO, "The corresponding MPI error string is: "//message)
+      call log_log(LOG_INFO, "MPI check success was called from "//mod_name//" and "//sub_name//" subroutine, &
+              after calling "//mpi_call)
       call mpi_abort(MPI_COMM_WORLD, 1, temp)
 !    else
 !      call log_log(LOG_INFO, "MPI check returned success")
