@@ -1259,7 +1259,7 @@ contains
     call date_and_time(values=date_values)
     call lock_mpi()
     call mpi_bcast(date_values, 8, MPI_INT, 0, io_configuration%io_communicator, ierr)
-    call check_mpi_success(ierr, "netcdf_filetype", "write_out_global_attributes")
+    call check_mpi_success(ierr, "netcdf_filetype", "write_out_global_attributes", "mpi_bcast")
     call unlock_mpi()
     date_time=trim(conv_to_string(date_values(3)))//"/"//&
          trim(conv_to_string(date_values(2)))//"/"//trim(conv_to_string(date_values(1)))//" "//trim(conv_to_string(&

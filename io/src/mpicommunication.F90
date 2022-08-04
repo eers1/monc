@@ -84,10 +84,10 @@ contains
         call lock_mpi()
         if (present(status)) then
           call mpi_test(request, flag, status, ierr)
-          call check_mpi_success(ierr, "mpi_communication_mod", "wait_for_mpi_request")
+          call check_mpi_success(ierr, "mpi_communication_mod", "wait_for_mpi_request", "mpi_test")
         else
           call mpi_test(request, flag, MPI_STATUS_IGNORE, ierr)
-          call check_mpi_success(ierr, "mpi_communication_mod", "wait_for_mpi_request")
+          call check_mpi_success(ierr, "mpi_communication_mod", "wait_for_mpi_request", "mpi_test")
         end if
         call unlock_mpi()      
         if (flag .ne. 1) call pause_for_mpi_interleaving()
@@ -95,10 +95,10 @@ contains
     else
       if (present(status)) then
         call mpi_wait(request, status, ierr)
-        call check_mpi_success(ierr, "mpi_communication_mod", "wait_for_mpi_request")
+        call check_mpi_success(ierr, "mpi_communication_mod", "wait_for_mpi_request", "mpi_wait")
       else
         call mpi_wait(request, MPI_STATUS_IGNORE, ierr)
-        call check_mpi_success(ierr, "mpi_communication_mod", "wait_for_mpi_request")
+        call check_mpi_success(ierr, "mpi_communication_mod", "wait_for_mpi_request", "mpi_wait")
       end if
     end if
   end subroutine wait_for_mpi_request  
@@ -118,13 +118,13 @@ contains
       do while (flag .ne. 1)
         call lock_mpi()
         call mpi_testall(count, requests, flag, MPI_STATUSES_IGNORE, ierr)
-        call check_mpi_success(ierr, "mpi_communication_mod", "waitall_for_mpi_requests")
+        call check_mpi_success(ierr, "mpi_communication_mod", "waitall_for_mpi_requests", "mpi_testall")
         call unlock_mpi()      
         if (flag .ne. 1) call pause_for_mpi_interleaving()
       end do
     else
       call mpi_waitall(count, requests, MPI_STATUSES_IGNORE, ierr)
-      call check_mpi_success(ierr, "mpi_communication_mod", "waitall_for_mpi_requests")
+      call check_mpi_success(ierr, "mpi_communication_mod", "waitall_for_mpi_requests", "mpi_waitall")
     end if
   end subroutine waitall_for_mpi_requests 
 
@@ -159,7 +159,7 @@ contains
     call lock_mpi()
     call mpi_irecv(command_buffer, 1, MPI_INT, MPI_ANY_SOURCE, COMMAND_TAG, &
          MPI_COMM_WORLD, command_request_handle, ierr)
-    call check_mpi_success(ierr, "mpi_communication_mod", "register_command_receive")
+    call check_mpi_success(ierr, "mpi_communication_mod", "register_command_receive", "mpi_irecv")
     call unlock_mpi()
   end subroutine register_command_receive
 
@@ -182,23 +182,23 @@ contains
       if (present(data_dump_id)) tag_to_use=tag_to_use+data_dump_id
       call lock_mpi()
       call mpi_irecv(dump_data, num_elements, mpi_datatype, source, tag_to_use, MPI_COMM_WORLD, request, ierr)
-      call check_mpi_success(ierr, "mpi_communication_mod", "data_receive")
+      call check_mpi_success(ierr, "mpi_communication_mod", "data_receive", "mpi_irecv")
       call unlock_mpi()
       call wait_for_mpi_request(request, status)
       call lock_mpi()
       call mpi_get_count(status, mpi_datatype, recv_count, ierr)      
-      call check_mpi_success(ierr, "mpi_communication_mod", "data_receive")
+      call check_mpi_success(ierr, "mpi_communication_mod", "data_receive", "mpi_get_count")
       call unlock_mpi()
       data_receive=recv_count
     else if (present(description_data)) then
       call lock_mpi()
       call mpi_irecv(description_data, num_elements, mpi_datatype, source, DATA_TAG, MPI_COMM_WORLD, request, ierr)
-      call check_mpi_success(ierr, "mpi_communication_mod", "data_receive")
+      call check_mpi_success(ierr, "mpi_communication_mod", "data_receive", "mpi_irecv")
       call unlock_mpi()
       call wait_for_mpi_request(request, status)
       call lock_mpi()
       call mpi_get_count(status, mpi_datatype, recv_count, ierr)      
-      call check_mpi_success(ierr, "mpi_communication_mod", "data_receive")
+      call check_mpi_success(ierr, "mpi_communication_mod", "data_receive", "mpi_get_count")
       call unlock_mpi()
       data_receive=recv_count
     end if    
@@ -219,7 +219,7 @@ contains
     if (req .ne. MPI_REQUEST_NULL) then
       call lock_mpi()
       call mpi_cancel(req, ierr)
-      call check_mpi_success(ierr, "mpi_communication_mod", "cancel_request")
+      call check_mpi_success(ierr, "mpi_communication_mod", "cancel_request","mpi_cancel")
       call unlock_mpi()
     end if
   end subroutine cancel_request  
@@ -235,7 +235,7 @@ contains
 
     call lock_mpi()
     call mpi_test(command_request_handle, complete, status, ierr)
-    call check_mpi_success(ierr, "mpi_communication_mod", "test_for_command")
+    call check_mpi_success(ierr, "mpi_communication_mod", "test_for_command", "mpi_test")
     call unlock_mpi()
 
     if (complete .eq. 1) then
@@ -266,14 +266,14 @@ contains
     call lock_mpi()
     do i=1, number_of_inter_io
       call mpi_iprobe(MPI_ANY_SOURCE, inter_io_communications(i)%message_tag, io_communicator, message_pending, status, ierr)
-      call check_mpi_success(ierr, "mpi_communication_mod", "test_for_inter_io")
+      call check_mpi_success(ierr, "mpi_communication_mod", "test_for_inter_io", "mpi_iprobe")
       if (message_pending) then
         call mpi_get_count(status, MPI_BYTE, message_size, ierr)
-        call check_mpi_success(ierr, "mpi_communication_mod", "test_for_inter_io")
+        call check_mpi_success(ierr, "mpi_communication_mod", "test_for_inter_io", "mpi_get_count")
         allocate(data_buffer(message_size))
         call mpi_recv(data_buffer, message_size, MPI_BYTE, status(MPI_SOURCE), inter_io_communications(i)%message_tag, &
              io_communicator, MPI_STATUS_IGNORE, ierr)
-        call check_mpi_success(ierr, "mpi_communication_mod", "test_for_inter_io")
+        call check_mpi_success(ierr, "mpi_communication_mod", "test_for_inter_io", "mpi_recv")
         call unlock_mpi()
         command=INTER_IO_COMMUNICATION
         source=i
@@ -293,7 +293,7 @@ contains
     integer :: ierr
 
     call mpi_type_free(the_type, ierr)
-    call check_mpi_success(ierr, "mpi_communication_mod", "free_mpi_type")
+    call check_mpi_success(ierr, "mpi_communication_mod", "free_mpi_type", "mpi_type_free")
   end subroutine free_mpi_type  
 
   !> Builds the MPI type that corresponds to the data which will be received from a specific MONC process. Two factors
@@ -404,12 +404,12 @@ contains
     end if
     call lock_mpi()
     call mpi_type_struct(type_counts, block_counts, offsets, old_types, new_type, ierr) 
-    call check_mpi_success(ierr, "mpi_communication_mod", "build_mpi_datatype")
+    call check_mpi_success(ierr, "mpi_communication_mod", "build_mpi_datatype", "mpi_type_struct")
     call mpi_type_commit(new_type, ierr)
-    call check_mpi_success(ierr, "mpi_communication_mod", "build_mpi_datatype")
+    call check_mpi_success(ierr, "mpi_communication_mod", "build_mpi_datatype", "mpi_type_commit")
     call unlock_mpi()
     call mpi_type_size(new_type, data_size, ierr)
-    call check_mpi_success(ierr, "mpi_communication_mod", "build_mpi_datatype")
+    call check_mpi_success(ierr, "mpi_communication_mod", "build_mpi_datatype", "mpi_type_size")
     build_mpi_datatype=new_type
 
   end function build_mpi_datatype

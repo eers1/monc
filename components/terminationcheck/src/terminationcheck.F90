@@ -109,7 +109,7 @@ module terminationcheck_mod
       current_state%continue_timestep=int(mpi_wtime() - current_state%model_start_wtime) .lt. max_walltime_secs
       call mpi_allreduce(MPI_IN_PLACE, current_state%continue_timestep, 1, MPI_LOGICAL, MPI_LOR, &
            current_state%parallel%monc_communicator, ierr)
-      call check_mpi_success(ierr, "terminationcheck_mod", "timestep_callback")
+      call check_mpi_success(ierr, "terminationcheck_mod", "timestep_callback", "mpi_allreduce")
       if (.not. current_state%continue_timestep) current_state%termination_reason=WALLTIME_TERMINATION_REASON
     end if    
 
@@ -117,10 +117,10 @@ module terminationcheck_mod
       if (current_state%parallel%my_rank == 0) then
         file_message_status=check_messages_file(current_state)
         call mpi_bcast(file_message_status, 1, MPI_INT, 0, current_state%parallel%monc_communicator, ierr)
-        call check_mpi_success(ierr, "terminationcheck_mod", "timestep_callback")
+        call check_mpi_success(ierr, "terminationcheck_mod", "timestep_callback", "mpi_bcast")
       else
         call mpi_bcast(file_message_status, 1, MPI_INT, 0, current_state%parallel%monc_communicator, ierr)
-        call check_mpi_success(ierr, "terminationcheck_mod", "timestep_callback")
+        call check_mpi_success(ierr, "terminationcheck_mod", "timestep_callback", "mpi_bcast")
         if (file_message_status == 1) current_state%continue_timestep=.false.
       end if
       if (.not. current_state%continue_timestep) current_state%termination_reason=MESSAGE_TERMINATION_REASON

@@ -1538,8 +1538,8 @@ contains
     call lock_mpi()
     call mpi_iallreduce(number_distinct_writes, field_to_write_information%max_num_collective_writes, 1, MPI_INT, MPI_MAX, &
          io_configuration%io_communicator, field_to_write_information%max_num_collective_writes_request_handle, ierr)
+    call check_mpi_success(ierr, "writer_federator", "initialise_contiguous_data_regions", "mpi_iallreduce")
     call unlock_mpi()
-    call check_mpi_success(ierr, "writer_federator", "initialise_contiguous_data_regions")
   end subroutine initialise_contiguous_data_regions
 
   !> Retrieves the number of common starting points that match a specific input value

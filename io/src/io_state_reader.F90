@@ -80,7 +80,7 @@ contains
 
     call mpi_comm_rank(io_communicator_arg, my_io_server_rank, ierr)
     call mpi_comm_size(io_communicator_arg, number_io_server, ierr)
-    call check_mpi_success(ierr, "io_server_state_reader_mod", "read_io_server_configuration")
+    call check_mpi_success(ierr, "io_server_state_reader_mod", "read_io_server_configuration", "mpi_comm_size")
     call check_netcdf_status(nf90_open(path = checkpoint_filename, mode = nf90_nowrite, ncid = ncid))
     call check_netcdf_status(nf90_inq_dimid(ncid, "entries_directory_dim", dim_id), found)
     if (.not. found) then

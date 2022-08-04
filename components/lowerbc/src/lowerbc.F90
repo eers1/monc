@@ -269,12 +269,12 @@ contains
     if (allocated(y_wrapping_recv_buffer)) then
       call mpi_irecv(y_wrapping_recv_buffer, size(y_wrapping_recv_buffer), PRECISION_TYPE, &
            y_wrapping_target_id, 0, current_state%parallel%neighbour_comm, wrapping_comm_requests(1), ierr)
-      call check_mpi_success(ierr, "lowerbc_mod", "register_async_wrapping_recv_requests")
+      call check_mpi_success(ierr, "lowerbc_mod", "register_async_wrapping_recv_requests", "mpi_irecv")
     end if
     if (allocated(x_wrapping_recv_buffer)) then
       call mpi_irecv(x_wrapping_recv_buffer, size(x_wrapping_recv_buffer), PRECISION_TYPE, &
            x_wrapping_target_id, 0, current_state%parallel%neighbour_comm, wrapping_comm_requests(3), ierr)
-      call check_mpi_success(ierr, "lowerbc_mod", "register_async_wrapping_recv_requests")
+      call check_mpi_success(ierr, "lowerbc_mod", "register_async_wrapping_recv_requests", "mpi_irecv")
     end if
   end subroutine register_async_wrapping_recv_requests
   
@@ -301,7 +301,7 @@ contains
         call mpi_isend(y_wrapping_send_buffer, size(y_wrapping_send_buffer), PRECISION_TYPE, &
              y_wrapping_target_id, 0, current_state%parallel%neighbour_comm, &
              wrapping_comm_requests(2), ierr)       
-        call check_mpi_success(ierr, "lowerbc_mod", "complete_async_wrapping")
+        call check_mpi_success(ierr, "lowerbc_mod", "complete_async_wrapping", "mpi_isend")
       end if
       if (allocated(x_wrapping_send_buffer)) then
         if (current_state%parallel%my_coords(X_INDEX) == 0) then
@@ -314,13 +314,13 @@ contains
         call mpi_isend(x_wrapping_send_buffer, size(x_wrapping_send_buffer), PRECISION_TYPE, &
              x_wrapping_target_id, 0, current_state%parallel%neighbour_comm, &
              wrapping_comm_requests(4), ierr)        
-        call check_mpi_success(ierr, "lowerbc_mod", "complete_async_wrapping")
+        call check_mpi_success(ierr, "lowerbc_mod", "complete_async_wrapping", "mpi_isend")
       end if
 
       ! If send buffer is allocated then recv buffer is allocated, therefore only test the send buffer here and assume recv
       call mpi_waitall(4, wrapping_comm_requests, MPI_STATUSES_IGNORE, ierr)
       wrapping_comm_requests=MPI_REQUEST_NULL
-      call check_mpi_success(ierr, "lowerbc_mod", "complete_async_wrapping")
+      call check_mpi_success(ierr, "lowerbc_mod", "complete_async_wrapping", "mpi_waitall")
       if (allocated(y_wrapping_recv_buffer)) then
         if (current_state%parallel%my_coords(Y_INDEX) == 0) then
           call unpackage_y_wrapping_recv_buffer(current_state, zth, zq, 1, 2)

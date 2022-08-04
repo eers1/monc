@@ -151,7 +151,7 @@ contains
     combined_handles(1)=current_state%psrce_x_hs_recv_request
     combined_handles(2)=current_state%psrce_y_hs_recv_request
     call mpi_waitall(2, combined_handles, MPI_STATUSES_IGNORE, ierr)
-    call check_mpi_success(ierr, "fftsolver_mod", "complete_psrce_calculation")
+    call check_mpi_success(ierr, "fftsolver_mod", "complete_psrce_calculation", "mpi_waitall")
 
     do j=current_state%local_grid%local_domain_start_index(Y_INDEX), current_state%local_grid%local_domain_end_index(Y_INDEX)
       do k=2,current_state%local_grid%size(Z_INDEX)
@@ -178,7 +178,7 @@ contains
     combined_handles(1)=current_state%psrce_x_hs_send_request
     combined_handles(2)=current_state%psrce_y_hs_send_request
     call mpi_waitall(2, combined_handles, MPI_STATUSES_IGNORE, ierr)
-    call check_mpi_success(ierr, "fftsolver_mod", "complete_psrce_calculation")
+    call check_mpi_success(ierr, "fftsolver_mod", "complete_psrce_calculation", "mpi_waitall")
   end subroutine complete_psrce_calculation 
   
   !> The tridiagonal solver which runs in Fourier space on the pressure terms. Note that because we are going

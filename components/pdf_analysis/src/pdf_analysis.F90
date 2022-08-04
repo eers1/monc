@@ -88,7 +88,7 @@ contains
     !> Allocate and collect horizontal local sizes, send to all proceses
     allocate(gpts_on_proc(current_state%parallel%processes))
     call mpi_allgather(lpts, 1, MPI_INT, gpts_on_proc, 1, MPI_INT, current_state%parallel%monc_communicator, ierr)
-    call check_mpi_success(ierr, "pdf_analysis_mod", "init_callback")
+    call check_mpi_success(ierr, "pdf_analysis_mod", "init_callback", "mpi_allgather")
 
     !> Allocate and initialize displacement values
     allocate(displacements(current_state%parallel%processes)) 
@@ -176,7 +176,7 @@ contains
        !> Gather 2d field to single process
        call mpi_gatherv(tmp_var, lpts, PRECISION_TYPE, tmp_all, gpts_on_proc, displacements, PRECISION_TYPE, &
                         0, current_state%parallel%monc_communicator, ierr )
-       call check_mpi_success(ierr, "pdf_analysis_mod", "calculate_w_percentiles")
+       call check_mpi_success(ierr, "pdf_analysis_mod", "calculate_w_percentiles", "mpi_gatherv")
 
        !> Perform global operations
        if (current_state%parallel%my_rank == 0) then
@@ -218,10 +218,10 @@ contains
     !> Inform all processes of calculated thresholds
     call mpi_bcast(current_state%global_grid%configuration%vertical%w_dwn(:), current_state%local_grid%size(Z_INDEX), &
                    PRECISION_TYPE, 0, current_state%parallel%monc_communicator, ierr)
-    call check_mpi_success(ierr, "pdf_analysis_mod", "calculate_w_percentiles")
+    call check_mpi_success(ierr, "pdf_analysis_mod", "calculate_w_percentiles", "mpi_bcast")
     call mpi_bcast(current_state%global_grid%configuration%vertical%w_up(:),  current_state%local_grid%size(Z_INDEX), &
                    PRECISION_TYPE, 0, current_state%parallel%monc_communicator, ierr)
-    call check_mpi_success(ierr, "pdf_analysis_mod", "calculate_w_percentiles")
+    call check_mpi_success(ierr, "pdf_analysis_mod", "calculate_w_percentiles", "mpi_bcast")
 
 
     !> Display some diagnostics, if requested

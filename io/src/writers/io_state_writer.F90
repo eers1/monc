@@ -166,10 +166,10 @@ contains
     call lock_mpi()
     call mpi_iallreduce(MPI_IN_PLACE, global_writer_entry_byte_size, size(global_writer_entry_byte_size), MPI_LONG_LONG_INT, &
          MPI_SUM, io_configuration%io_communicator, global_writer_entry_byte_size_request, ierr)
-    call check_mpi_success(ierr, "io_state_writer", "prepare_io_server_state_storage")
+    call check_mpi_success(ierr, "io_state_writer", "prepare_io_server_state_storage", "mpi_iallreduce")
     call mpi_iscan(MPI_IN_PLACE, my_writer_entry_start_point, size(my_writer_entry_start_point), MPI_LONG_LONG_INT, &
          MPI_SUM, io_configuration%io_communicator, my_writer_entry_start_request, ierr)
-    call check_mpi_success(ierr, "io_state_writer", "prepare_io_server_state_storage")
+    call check_mpi_success(ierr, "io_state_writer", "prepare_io_server_state_storage", "mpi_iscan")
     call unlock_mpi()
   end subroutine prepare_io_server_state_storage
 

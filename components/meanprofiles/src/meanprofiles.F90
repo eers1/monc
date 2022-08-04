@@ -166,6 +166,6 @@ contains
 
     call mpi_allreduce(MPI_IN_PLACE, bartmp, bar_fields*current_state%local_grid%size(Z_INDEX), PRECISION_TYPE, MPI_SUM, &
          current_state%parallel%monc_communicator, ierr)
-    call check_mpi_success(ierr, "meanprofiles_mod", "calculate_sum_profiles")
+    call check_mpi_success(ierr, "meanprofiles_mod", "calculate_sum_profiles", "mpi_allreduce")
   end subroutine calculate_sum_profiles
 end module meanprofiles_mod

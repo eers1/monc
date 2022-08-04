@@ -207,16 +207,16 @@ contains
     integer :: ierr
 
     call mpi_allreduce(local_zumax, global_zumax, 1, PRECISION_TYPE, MPI_MAX, parallel_state%monc_communicator, ierr)
-    call check_mpi_success(ierr, "cfltest_mod", "get_global_values")
+    call check_mpi_success(ierr, "cfltest_mod", "get_global_values", "mpi_allreduce")
     call mpi_allreduce(local_zvmax, global_zvmax, 1, PRECISION_TYPE, MPI_MAX, parallel_state%monc_communicator, ierr)
-    call check_mpi_success(ierr, "cfltest_mod", "get_global_values")
+    call check_mpi_success(ierr, "cfltest_mod", "get_global_values", "mpi_allreduce")
     call mpi_allreduce(local_cvel_z, global_cvel_z, 1, PRECISION_TYPE, MPI_MAX, parallel_state%monc_communicator, ierr)
-    call check_mpi_success(ierr, "cfltest_mod", "get_global_values")
+    call check_mpi_success(ierr, "cfltest_mod", "get_global_values", "mpi_allreduce")
     call mpi_allreduce(local_cvis, global_cvis, 1, PRECISION_TYPE, MPI_MAX, parallel_state%monc_communicator, ierr)
-    call check_mpi_success(ierr, "cfltest_mod", "get_global_values")
+    call check_mpi_success(ierr, "cfltest_mod", "get_global_values", "mpi_allreduce")
     call mpi_allreduce(local_zumin, global_zumin, 1, PRECISION_TYPE, MPI_MIN, parallel_state%monc_communicator, ierr)
-    call check_mpi_success(ierr, "cfltest_mod", "get_global_values")
+    call check_mpi_success(ierr, "cfltest_mod", "get_global_values", "mpi_allreduce")
     call mpi_allreduce(local_zvmin, global_zvmin, 1, PRECISION_TYPE, MPI_MIN, parallel_state%monc_communicator, ierr)
-    call check_mpi_success(ierr, "cfltest_mod", "get_global_values")
+    call check_mpi_success(ierr, "cfltest_mod", "get_global_values", "mpi_allreduce")
   end subroutine get_global_values
 end module cfltest_mod

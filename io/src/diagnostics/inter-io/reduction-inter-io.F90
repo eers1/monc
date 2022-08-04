@@ -290,7 +290,7 @@ contains
              MPI_BYTE, reduction_progress%root, &
              io_configuration%inter_io_communications(inter_io_comm_index)%message_tag, &
              io_configuration%io_communicator, reduction_progress%async_handle, ierr)
-        call check_mpi_success(ierr, "reduction_inter_io_mod", "handle_local_moncs_completed_collective")
+        call check_mpi_success(ierr, "reduction_inter_io_mod", "handle_local_moncs_completed_collective", "mpi_isend")
         call unlock_mpi()
         ! Deallocate the current value as this is finished with and has been packed into the send buffer
         if (allocated(reduction_progress%values)) deallocate(reduction_progress%values)

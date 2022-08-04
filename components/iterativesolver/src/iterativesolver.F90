@@ -496,7 +496,7 @@ contains
 
     call mpi_allreduce(local_sum, global_sum, 1, PRECISION_TYPE, MPI_SUM, current_state%parallel%monc_communicator, ierr)
     inner_prod=global_sum
-    call check_mpi_success(ierr, "iterativesolver_mod", "inner_prod")
+    call check_mpi_success(ierr, "iterativesolver_mod", "inner_prod", "mpi_allreduce")
   end function inner_prod
 
   !> Returns the global inner product of a pair of vectors, ignoring the halo cells for three separate pairs. This call
@@ -530,7 +530,7 @@ contains
 
     call mpi_allreduce(local_sum, global_sum, 3, PRECISION_TYPE, MPI_SUM, current_state%parallel%monc_communicator, ierr)
     inner_prod_three_way=global_sum
-    call check_mpi_success(ierr, "iterativesolver_mod", "inner_prod_three_way")
+    call check_mpi_success(ierr, "iterativesolver_mod", "inner_prod_three_way", "mpi_allreduce")
   end function inner_prod_three_way 
 
   !> Sets the values of the provided matrix to solve the poisson equation
@@ -591,7 +591,7 @@ contains
     
     call mpi_allreduce(current_state%local_divmax, current_state%global_divmax, 1, PRECISION_TYPE, MPI_MAX, &
          current_state%parallel%monc_communicator, ierr)
-    call check_mpi_success(ierr, "iterativesolver_mod", "deduce_global_divmax")
+    call check_mpi_success(ierr, "iterativesolver_mod", "deduce_global_divmax", "mpi_allreduce")
   end subroutine deduce_global_divmax   
 
   !> Copies the p field data to halo buffers for a specific process in a dimension and halo cell
@@ -745,7 +745,7 @@ contains
     combined_handles(1)=current_state%psrce_x_hs_recv_request
     combined_handles(2)=current_state%psrce_y_hs_recv_request
     call mpi_waitall(2, combined_handles, MPI_STATUSES_IGNORE, ierr)
-    call check_mpi_success(ierr, "iterativesolver_mod", "complete_psrce_calculation")
+    call check_mpi_success(ierr, "iterativesolver_mod", "complete_psrce_calculation", "mpi_waitall")
 
     do j=current_state%local_grid%local_domain_start_index(Y_INDEX), current_state%local_grid%local_domain_end_index(Y_INDEX)
       do k=2,current_state%local_grid%size(Z_INDEX)
@@ -772,6 +772,6 @@ contains
     combined_handles(1)=current_state%psrce_x_hs_send_request
     combined_handles(2)=current_state%psrce_y_hs_send_request
     call mpi_waitall(2, combined_handles, MPI_STATUSES_IGNORE, ierr)
-    call check_mpi_success(ierr, "iterativesolver_mod", "complete_psrce_calculation")
+    call check_mpi_success(ierr, "iterativesolver_mod", "complete_psrce_calculation", "mpi_waitall")
   end subroutine complete_psrce_calculation 
 end module iterativesolver_mod

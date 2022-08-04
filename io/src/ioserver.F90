@@ -417,10 +417,10 @@ contains
     call lock_mpi()
     call mpi_isend(registree_definition_descriptions, size(registree_definition_descriptions), mpi_type_definition_description, &
          source, DATA_TAG, MPI_COMM_WORLD, srequest(1), ierr)
-    call check_mpi_success(ierr, "io_server", "send_configuration_to_registree")
+    call check_mpi_success(ierr, "io_server", "send_configuration_to_registree", "mpi_isend")
     call mpi_isend(registree_field_descriptions, size(registree_field_descriptions), mpi_type_field_description, &
          source, DATA_TAG, MPI_COMM_WORLD, srequest(2), ierr)
-    call check_mpi_success(ierr, "io_server", "send_configuration_to_registree")
+    call check_mpi_success(ierr, "io_server", "send_configuration_to_registree", "mpi_isend")
     call unlock_mpi()
 
     send_configuration_to_registree=srequest    

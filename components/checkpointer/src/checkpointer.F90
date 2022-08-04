@@ -100,7 +100,7 @@ contains
     end if
     ! Barrier here to ensure all processes dumped before log_log stats (is there a better way?)
     call mpi_barrier(current_state%parallel%monc_communicator, ierr)
-    call check_mpi_success(ierr, "checkpointer_mod", "perform_checkpoint_dump")
+    call check_mpi_success(ierr, "checkpointer_mod", "perform_checkpoint_dump", "mpi_barrier")
     call cpu_time(end_dump_time)
     call log_dump_stats(current_state, start_dump_time, end_dump_time)
   end subroutine perform_checkpoint_dump
