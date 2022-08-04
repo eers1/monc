@@ -96,7 +96,9 @@ contains
     call send_monc_specific_data_to_server(current_state, mpi_type_data_sizing_description)
 
     call mpi_type_free(mpi_type_data_sizing_description, ierr)
+    call check_mpi_success(ierr, "iobridge_mod", "init_callback")
     call mpi_type_free(mpi_type_definition_description, ierr)
+    call check_mpi_success(ierr, "iobridge_mod", "init_callback")
     call mpi_type_free(mpi_type_field_description, ierr)
     call check_mpi_success(ierr, "iobridge_mod", "init_callback")
 

@@ -64,9 +64,13 @@ contains
     integer(kind=MPI_ADDRESS_KIND) :: large_number_extents(5)
     
     call mpi_type_extent(MPI_INT, large_number_extents(INTEGER_DATA_TYPE), ierr)
+    call check_mpi_success(ierr, "io_server_client_mod", "populate_mpi_type_extents")
     call mpi_type_extent(MPI_LOGICAL, large_number_extents(BOOLEAN_DATA_TYPE), ierr)
+    call check_mpi_success(ierr, "io_server_client_mod", "populate_mpi_type_extents")
     call mpi_type_extent(MPI_CHARACTER, large_number_extents(STRING_DATA_TYPE), ierr)
+    call check_mpi_success(ierr, "io_server_client_mod", "populate_mpi_type_extents")
     call mpi_type_extent(MPI_REAL, large_number_extents(FLOAT_DATA_TYPE), ierr)
+    call check_mpi_success(ierr, "io_server_client_mod", "populate_mpi_type_extents")
     call mpi_type_extent(MPI_DOUBLE_PRECISION, large_number_extents(DOUBLE_DATA_TYPE), ierr)
     call check_mpi_success(ierr, "io_server_client_mod", "populate_mpi_type_extents")
 

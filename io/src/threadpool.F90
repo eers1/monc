@@ -9,9 +9,7 @@ module threadpool_mod
   use conversions_mod, only : conv_to_string
   use logging_mod, only : LOG_ERROR, LOG_WARN, log_log
   use configuration_parser_mod, only : io_configuration_type
-  use mpi, only : MPI_THREAD_MULTIPLE, MPI_THREAD_SERIALIZED, mpi_comm_world, mpi_error_string, mpi_abort, &
-          mpi_max_error_string
-  use mpi_error_handler_mod, only : check_mpi_success
+  use mpi, only : MPI_THREAD_MULTIPLE, MPI_THREAD_SERIALIZED
   implicit none
 
 #ifndef TEST_MODE
