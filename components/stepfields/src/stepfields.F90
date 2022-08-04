@@ -88,7 +88,7 @@ contains
   !! @param current_state The current model state
   subroutine initialisation_callback(current_state)
     type(model_state_type), target, intent(inout) :: current_state
-    logical :: l_qdiag=.false.
+    logical :: l_qdiag
 
 #ifdef U_ACTIVE
     allocate(current_state%global_grid%configuration%vertical%savolubar(current_state%local_grid%size(Z_INDEX)))
@@ -104,7 +104,7 @@ contains
     ! Set tendency diagnostic logicals based on availability
     ! Need to use 3d tendencies to compute the profiles, so they will be allocated
     !      in the case where profiles are available
-    !l_qdiag =  (.not. current_state%passive_q .and. current_state%number_q_fields .gt. 0) 
+    l_qdiag =  (.not. current_state%passive_q .and. current_state%number_q_fields .gt. 0) 
 
     l_tend_pr_tot_th  = current_state%th%active
     l_tend_pr_tot_qv  = l_qdiag .and. current_state%number_q_fields .ge. 1

@@ -100,7 +100,7 @@ contains
     type(model_state_type), target, intent(inout) :: current_state
 
     integer :: k
-    logical :: l_qdiag=.false.
+    logical :: l_qdiag
 
     if (.not. is_component_enabled(current_state%options_database, "mean_profiles")) then
       call log_master_log(LOG_ERROR, "Damping requires the mean profiles component to be enabled")
@@ -130,7 +130,7 @@ contains
     ! Set tendency diagnostic logicals based on availability
     ! Need to use 3d tendencies to compute the profiles, so they will be allocated
     !      in the case where profiles are available
-    !l_qdiag =  (.not. current_state%passive_q .and. current_state%number_q_fields .gt. 0)
+    l_qdiag =  (.not. current_state%passive_q .and. current_state%number_q_fields .gt. 0)
 
     l_tend_pr_tot_u   = current_state%u%active
     l_tend_pr_tot_v   = current_state%v%active

@@ -87,7 +87,7 @@ contains
   !! @param current_state The current model state
   subroutine initialisation_callback(current_state)
     type(model_state_type), target, intent(inout) :: current_state
-    logical :: l_qdiag=.false.
+    logical :: l_qdiag
 
     advect_flow=determine_if_advection_here(options_get_string(current_state%options_database, "advection_flow_fields"))
     advect_th=determine_if_advection_here(options_get_string(current_state%options_database, "advection_theta_field"))
@@ -96,7 +96,7 @@ contains
     ! Set tendency diagnostic logicals based on availability 
     ! Need to use 3d tendencies to compute the profiles, so they will be allocated 
     !      in the case where profiles are available
-    !l_qdiag =  (.not. current_state%passive_q .and. current_state%number_q_fields .gt. 0) .and. advect_q
+    l_qdiag =  (.not. current_state%passive_q .and. current_state%number_q_fields .gt. 0) .and. advect_q
 
     l_tend_pr_tot_u   = current_state%u%active .and. advect_flow 
     l_tend_pr_tot_v   = current_state%v%active .and. advect_flow

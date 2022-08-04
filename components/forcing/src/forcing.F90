@@ -474,7 +474,7 @@ contains
                                                             ! be converted to theta (potential temerature).
 
     integer :: k
-    logical :: l_qdiag=.false.
+    logical :: l_qdiag
 
     allocate(u_profile(current_state%local_grid%size(Z_INDEX)),      &
        v_profile(current_state%local_grid%size(Z_INDEX)),            &
@@ -752,7 +752,7 @@ contains
     ! Set tendency diagnostic logicals based on availability
     ! Need to use 3d tendencies to compute the profiles, so they will be allocated
     !      in the case where profiles are available
-    !l_qdiag =  (.not. current_state%passive_q .and. current_state%number_q_fields .gt. 0)
+    l_qdiag =  (.not. current_state%passive_q .and. current_state%number_q_fields .gt. 0)
 
     l_tend_pr_tot_u   = current_state%u%active
     l_tend_pr_tot_v   = current_state%v%active
