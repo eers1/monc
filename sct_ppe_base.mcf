@@ -37,7 +37,7 @@ socrates_couple_enabled=.true.
 
 display_synopsis_frequency=100
 nn_consolidation=1
-termination_time=260000.0  
+termination_time=349000.0 #280000.0 run an extra day for the extra simulations 
 dtm=0.4
 
 # IO server configuration
@@ -163,8 +163,8 @@ subsidence_local_q=.true.
 use_surface_boundary_conditions=.true.
 use_time_varying_surface_values=.true.
 type_of_surface_boundary_conditions = 1 
-surface_boundary_input_times = 0.0, 28800.0, 50400.0, 72000.0, 93600.0,117000.0,136800.0,158400.0,180000.0,201600.0,223200.0,243800.0,266400.0
-surface_temperatures  = 293.75, 294.16, 294.55, 295.08, 295.57, 296.1, 296.55, 297.02, 297.54, 298.06, 298.44, 298.8, 299.17
+surface_boundary_input_times = 0.0, 28800.0, 50400.0, 72000.0, 93600.0,117000.0,136800.0,158400.0,180000.0,201600.0,223200.0,243800.0,266400.0,288000.0,309600.0,331200.0,352800.0
+surface_temperatures  = 293.75, 294.16, 294.55, 295.08, 295.57, 296.1, 296.55, 297.02, 297.54, 298.06, 298.44, 298.8, 299.17, 299.61, 300.05, 300.49, 300.93
 #surface_latent_heat_flux   = 115.0            # 130.052
 #surface_sensible_heat_flux = 15.0             # 8.04
 

@@ -26,6 +26,7 @@ module load petsc/3.14.2
 
 module load cray-dsmml
 module load cray-fftw/3.3.8.9
+module load cray-mpich/8.1.4
 module load cray-netcdf-hdf5parallel
 
 module load atp

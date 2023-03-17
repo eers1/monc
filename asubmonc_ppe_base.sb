@@ -1,15 +1,15 @@
 #!/bin/bash
-#SBATCH --job-name=msct_run_name
+#SBATCH --job-name=msctrun_name
 #SBATCH --output=%x.o%j
 #SBATCH --open-mode=append
 #SBATCH --nodes=20  #24
 #SBATCH --ntasks-per-node=128
 #SBATCH --ntasks=2560   #3072 
 #SBATCH --cpus-per-task=1
-#SBATCH --time=09:00:00   #11:00:00  #16 hours
-#SBATCH --account=n02-ncas #n02-NES015868
+#SBATCH --time=09:00:00  # 11:00:00  #16 hours
+#SBATCH --account=n02-U2114653
 #SBATCH --partition=standard
-#SBATCH --qos=standard
+#SBATCH --qos=lowpriority
 
 compiler=gnu
 #compiler=cray
